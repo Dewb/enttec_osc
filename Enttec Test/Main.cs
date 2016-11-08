@@ -8,14 +8,85 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using System.Collections.Generic;
+
+using SharpOSC;
+
 
 namespace Enttec_Test
 {
+
     public partial class Main : Form
     {
+        UDPListener listener = null;
+        Thread updateThread = null;
+                
+        Queue<OscMessage> messageQueue = new Queue<OscMessage>();
+
         public Main()
         {
             InitializeComponent();
+
+            HandleOscPacket callback = delegate(OscPacket packet)
+            {
+                if (packet is OscMessage)
+                {
+                    var msg = (OscMessage)packet;
+                    if (msg.Address == "/dmx")
+                    {
+                        messageQueue.Enqueue(msg);
+                    }
+                }
+                else if (packet is OscBundle)
+                {
+                    var bundle = (OscBundle)packet;
+                    foreach (OscMessage msg in bundle.Messages)
+                    {
+                        if (msg.Address == "/dmx")
+                        {
+                            messageQueue.Enqueue(msg);
+                        }
+                    }
+                }
+
+                
+            };
+
+            updateThread = new Thread(delegate()
+                {
+                    OscMessage message;
+                    while (true)
+                    {
+                        if (messageQueue.Count > 0)
+                        {
+                            message = messageQueue.Dequeue();
+                            if (message != null && OpenDMX.status == FT_STATUS.FT_OK)
+                            {
+                                int channels = Math.Min(message.Arguments.Count, OpenDMX.UNIVERSE_SIZE);
+                                for (int i = 0; i < channels; i++)
+                                {
+                                    try
+                                    {
+                                        float value = Convert.ToSingle(message.Arguments[i]);
+                                        OpenDMX.setDmxValue(i + 1, (byte)(value * 255));
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
+                                }
+
+                                OpenDMX.streamData();
+
+                            }
+                        }
+                    }
+                }
+            );
+            updateThread.Start();
+
+            listener = new UDPListener(7000, callback);
+
+            
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -97,11 +168,13 @@ namespace Enttec_Test
             OpenDMX.writeData();
 
         }
+
     }
     public class OpenDMX
     {
+        public static int UNIVERSE_SIZE = 8;
 
-        public static byte[] buffer = new byte[513];
+        public static byte[] buffer = new byte[UNIVERSE_SIZE + 1];
         public static uint handle;
         public static bool done = false;
         public static bool Connected = false;
@@ -163,6 +236,18 @@ namespace Enttec_Test
             {
                 buffer[channel ] = value;
             }
+        }
+
+        public static void streamData()
+        {
+            status = FT_SetBreakOn(handle);
+            status = FT_SetBreakOff(handle);
+            bytesWritten = write(handle, buffer, buffer.Length);
+            Thread.Sleep(8);
+            status = FT_SetBreakOn(handle);
+            status = FT_SetBreakOff(handle);
+            bytesWritten = write(handle, buffer, buffer.Length);
+            Thread.Sleep(8);
         }
 
         public static void  writeData()

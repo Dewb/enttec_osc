@@ -46,13 +46,14 @@
             this.label3 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.label4 = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOff
             // 
             this.btnOff.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnOff.Location = new System.Drawing.Point(83, 44);
+            this.btnOff.Location = new System.Drawing.Point(157, 44);
             this.btnOff.Name = "btnOff";
             this.btnOff.Size = new System.Drawing.Size(75, 26);
             this.btnOff.TabIndex = 0;
@@ -63,7 +64,7 @@
             // btnAllOn
             // 
             this.btnAllOn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAllOn.Location = new System.Drawing.Point(83, 10);
+            this.btnAllOn.Location = new System.Drawing.Point(157, 12);
             this.btnAllOn.Name = "btnAllOn";
             this.btnAllOn.Size = new System.Drawing.Size(75, 26);
             this.btnAllOn.TabIndex = 1;
@@ -192,7 +193,7 @@
             // 
             this.label3.Location = new System.Drawing.Point(7, 189);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(124, 102);
+            this.label3.Size = new System.Drawing.Size(124, 61);
             this.label3.TabIndex = 92;
             this.label3.Text = "Note: You must load the Win D2XX drivers from the Enttec.com website, then restar" +
     "t PC.";
@@ -210,14 +211,24 @@
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(158, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(133, 17);
             this.toolStripStatusLabel1.Text = "No Enttec USB Device Found";
+            // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(13, 12);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(124, 28);
+            this.label4.TabIndex = 94;
+            this.label4.Text = "Listening for /dmx OSC messages on port 7000";
+
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(258, 329);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnOpenEnttec);
@@ -236,7 +247,7 @@
             this.Controls.Add(this.btnOff);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Main";
-            this.Text = "Enttec DMX Test";
+            this.Text = "Enttec DMX - OSC Bridge";
             this.Load += new System.EventHandler(this.Main_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -264,6 +275,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.Label label4;
     }
 }
 
