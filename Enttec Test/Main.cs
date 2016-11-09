@@ -23,9 +23,39 @@ namespace Enttec_Test
                 
         Queue<OscMessage> messageQueue = new Queue<OscMessage>();
 
+        TrackBar[] trackBars;
+        Label[] labels;
+
+        byte[] mostRecentData = new byte[8];
+        System.Windows.Forms.Timer refreshTimer = new System.Windows.Forms.Timer();
+
         public Main()
         {
             InitializeComponent();
+
+            trackBars = new TrackBar[]
+            {
+                trackBar1,
+                trackBar2,
+                trackBar3,
+                trackBar4,
+                trackBar5,
+                trackBar6,
+                trackBar7,
+                trackBar8
+            };
+
+            labels = new Label[]
+            {
+                label1,
+                label2,
+                label5,
+                label6,
+                label7,
+                label8,
+                label9,
+                label10
+            };
 
             HandleOscPacket callback = delegate(OscPacket packet)
             {
@@ -62,13 +92,18 @@ namespace Enttec_Test
                             message = messageQueue.Dequeue();
                             if (message != null && OpenDMX.status == FT_STATUS.FT_OK)
                             {
+
+
                                 int channels = Math.Min(message.Arguments.Count, OpenDMX.UNIVERSE_SIZE);
                                 for (int i = 0; i < channels; i++)
                                 {
                                     try
                                     {
                                         float value = Convert.ToSingle(message.Arguments[i]);
-                                        OpenDMX.setDmxValue(i + 1, (byte)(value * 255));
+                                        byte byteVal = (byte)(value * 255);
+                                        OpenDMX.setDmxValue(i + 1, byteVal);
+
+                                        mostRecentData[i] = byteVal;
                                     }
                                     catch (Exception)
                                     {
@@ -86,7 +121,23 @@ namespace Enttec_Test
 
             listener = new UDPListener(7000, callback);
 
+            refreshTimer.Interval = 500; //ms
+            refreshTimer.Tick += new EventHandler(timer_Tick);
+            refreshTimer.Start();
+
             
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                byte b = mostRecentData[i];
+                if ((byte) trackBars[i].Value != b)
+                {
+                    setSlider(i, b);
+                }
+            }
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -107,6 +158,34 @@ namespace Enttec_Test
                 toolStripStatusLabel1.Text = "Error Connecting to Enttec USB Device";
 
             }
+
+            // On initialization, reset alll lights to zero
+            OpenDMX.setDmxValue(1, 0);
+            OpenDMX.setDmxValue(2, 0);
+            OpenDMX.setDmxValue(3, 0);
+            OpenDMX.setDmxValue(4, 0);
+            OpenDMX.setDmxValue(5, 0);
+            OpenDMX.setDmxValue(6, 0);
+            OpenDMX.setDmxValue(7, 0);
+            OpenDMX.setDmxValue(8, 0);
+            OpenDMX.writeData();
+
+            // For some reason we need duplication...
+            OpenDMX.setDmxValue(1, 0);
+            OpenDMX.setDmxValue(2, 0);
+            OpenDMX.setDmxValue(3, 0);
+            OpenDMX.setDmxValue(4, 0);
+            OpenDMX.setDmxValue(5, 0);
+            OpenDMX.setDmxValue(6, 0);
+            OpenDMX.setDmxValue(7, 0);
+            OpenDMX.setDmxValue(8, 0);
+            OpenDMX.writeData();
+
+
+            for (int i = 0; i < 8; i++)
+            {
+                mostRecentData[i] = 0;
+            }
         }
 
         private void btnOff_Click(object sender, EventArgs e)
@@ -118,7 +197,30 @@ namespace Enttec_Test
             OpenDMX.setDmxValue(1, 0);
             OpenDMX.setDmxValue(2, 0);
             OpenDMX.setDmxValue(3, 0);
+            OpenDMX.setDmxValue(4, 0);
+            OpenDMX.setDmxValue(5, 0);
+            OpenDMX.setDmxValue(6, 0);
+            OpenDMX.setDmxValue(7, 0);
+            OpenDMX.setDmxValue(8, 0);
             OpenDMX.writeData();
+
+            // For some reason we need duplication...
+            OpenDMX.setDmxValue(1, 0);
+            OpenDMX.setDmxValue(2, 0);
+            OpenDMX.setDmxValue(3, 0);
+            OpenDMX.setDmxValue(4, 0);
+            OpenDMX.setDmxValue(5, 0);
+            OpenDMX.setDmxValue(6, 0);
+            OpenDMX.setDmxValue(7, 0);
+            OpenDMX.setDmxValue(8, 0);
+            OpenDMX.writeData();
+
+            setSliders(0);
+
+            for (int i = 0; i < 8; i++)
+            {
+                mostRecentData[i] = 0;
+            }
 
         }
 
@@ -131,45 +233,135 @@ namespace Enttec_Test
             OpenDMX.setDmxValue(1, 255);
             OpenDMX.setDmxValue(2, 255);
             OpenDMX.setDmxValue(3, 255);
+            OpenDMX.setDmxValue(4, 255);
+            OpenDMX.setDmxValue(5, 255);
+            OpenDMX.setDmxValue(6, 255);
+            OpenDMX.setDmxValue(7, 255);
+            OpenDMX.setDmxValue(8, 255);
             OpenDMX.writeData();
 
+            // For some reason we need duplication...
+            OpenDMX.setDmxValue(1, 255);
+            OpenDMX.setDmxValue(2, 255);
+            OpenDMX.setDmxValue(3, 255);
+            OpenDMX.setDmxValue(4, 255);
+            OpenDMX.setDmxValue(5, 255);
+            OpenDMX.setDmxValue(6, 255);
+            OpenDMX.setDmxValue(7, 255);
+            OpenDMX.setDmxValue(8, 255);
+            OpenDMX.writeData();
+
+            setSliders(255);
+
+            for (int i = 0; i < 8; i++)
+            {
+                mostRecentData[i] = 255;
+            }
+        }
+
+        private void setSlider(int id, int val)
+        {
+            if (val > 255)
+                val = 255;
+            else if (val < 0)
+                val = 0;
+
+            trackBars[id].Value = val;
+            labels[id].Text = "" + val;
+        }
+
+        private void setSliders(int val)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                setSlider(i, val);
+            }
         }
 
 
-        private void btnScene1_Click(object sender, EventArgs e)
+        private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            if (OpenDMX.status == FT_STATUS.FT_DEVICE_NOT_FOUND)
-                toolStripStatusLabel1.Text = "No Enttec USB Device Found";
-            else
-                toolStripStatusLabel1.Text = "Found DMX on USB";
-            OpenDMX.setDmxValue(Convert.ToInt16(txtChannel1.Text), Convert.ToByte(txtLevel1.Text));
+            label1.Text = "" + trackBar1.Value;
+            OpenDMX.setDmxValue(1, (byte)trackBar1.Value);
             OpenDMX.writeData();
-
+            OpenDMX.setDmxValue(1, (byte)trackBar1.Value);
+            OpenDMX.writeData();
+            mostRecentData[0] = (byte) trackBar1.Value;
         }
 
-        private void btnScene2_Click(object sender, EventArgs e)
+        private void trackBar2_Scroll(object sender, EventArgs e)
         {
-            if (OpenDMX.status == FT_STATUS.FT_DEVICE_NOT_FOUND)
-                toolStripStatusLabel1.Text = "No Enttec USB Device Found";
-            else
-                toolStripStatusLabel1.Text = "Found DMX on USB";
-            OpenDMX.setDmxValue(Convert.ToInt16(txtChannel2.Text), Convert.ToByte(txtLevel2.Text));
+            label2.Text = "" + trackBar2.Value;
+            OpenDMX.setDmxValue(2, (byte)trackBar2.Value);
             OpenDMX.writeData();
-
+            OpenDMX.setDmxValue(2, (byte)trackBar2.Value);
+            OpenDMX.writeData();
+            mostRecentData[1] = (byte)trackBar2.Value;
         }
 
-        private void btnScene3_Click(object sender, EventArgs e)
+        private void trackBar3_Scroll(object sender, EventArgs e)
         {
-            if (OpenDMX.status == FT_STATUS.FT_DEVICE_NOT_FOUND)
-                toolStripStatusLabel1.Text = "No Enttec USB Device Found";
-            else
-                toolStripStatusLabel1.Text = "Found DMX on USB";
-            OpenDMX.setDmxValue(Convert.ToInt16(txtChannel3.Text), Convert.ToByte(txtLevel3.Text));
+            label5.Text = "" + trackBar3.Value;
+            OpenDMX.setDmxValue(3, (byte)trackBar3.Value);
             OpenDMX.writeData();
+            OpenDMX.setDmxValue(3, (byte)trackBar3.Value);
+            OpenDMX.writeData();
+            mostRecentData[2] = (byte)trackBar3.Value;
+        }
 
+        private void trackBar4_Scroll(object sender, EventArgs e)
+        {
+            label6.Text = "" + trackBar4.Value;
+            OpenDMX.setDmxValue(4, (byte)trackBar4.Value);
+            OpenDMX.writeData();
+            OpenDMX.setDmxValue(4, (byte)trackBar4.Value);
+            OpenDMX.writeData();
+            mostRecentData[3] = (byte)trackBar4.Value;
+        }
+
+        private void trackBar5_Scroll(object sender, EventArgs e)
+        {
+            label7.Text = "" + trackBar5.Value;
+            OpenDMX.setDmxValue(5, (byte)trackBar5.Value);
+            OpenDMX.writeData();
+            OpenDMX.setDmxValue(5, (byte)trackBar5.Value);
+            OpenDMX.writeData();
+            mostRecentData[4] = (byte)trackBar5.Value;
+        }
+
+        private void trackBar6_Scroll(object sender, EventArgs e)
+        {
+            label8.Text = "" + trackBar6.Value;
+            OpenDMX.setDmxValue(6, (byte)trackBar6.Value);
+            OpenDMX.writeData();
+            OpenDMX.setDmxValue(6, (byte)trackBar6.Value);
+            OpenDMX.writeData();
+            mostRecentData[5] = (byte)trackBar6.Value;
+        }
+
+        private void trackBar7_Scroll(object sender, EventArgs e)
+        {
+            label9.Text = "" + trackBar7.Value;
+            OpenDMX.setDmxValue(7, (byte)trackBar7.Value);
+            OpenDMX.writeData();
+            OpenDMX.setDmxValue(7, (byte)trackBar7.Value);
+            OpenDMX.writeData();
+            mostRecentData[6] = (byte)trackBar7.Value;
+        }
+
+        private void trackBar8_Scroll(object sender, EventArgs e)
+        {
+            label10.Text = "" + trackBar8.Value;
+            OpenDMX.setDmxValue(8, (byte)trackBar8.Value);
+            OpenDMX.writeData();
+            OpenDMX.setDmxValue(8, (byte)trackBar8.Value);
+            OpenDMX.writeData();
+            mostRecentData[7] = (byte)trackBar8.Value;
         }
 
     }
+
+
     public class OpenDMX
     {
         public static int UNIVERSE_SIZE = 8;
